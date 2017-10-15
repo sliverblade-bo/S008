@@ -11,6 +11,8 @@ public:
     virtual bool init();
     
     // a selector callback
+	void menuStartCallback(cocos2d::Ref* pSender);
+
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     // implement the "static create()" method manually
