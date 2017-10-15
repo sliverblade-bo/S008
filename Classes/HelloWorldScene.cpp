@@ -40,9 +40,13 @@ bool HelloWorld::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 
+	auto logo = Sprite::create("UI/logo.png");
+	logo->setAnchorPoint(Vec2(0.5, 0.5));
+	logo->setPosition(Vec2(visibleSize.width / 2, visibleSize.height * 0.75));
+	this->addChild(logo, 1);
 
-    auto sprite = Sprite::create("UI/Main.png");
-	startItem->setAnchorPoint(Vec2(0.5, 0.5));
+    auto sprite = Sprite::create("UI/main.png");
+	sprite->setAnchorPoint(Vec2(0.5, 0.5));
     sprite->setPosition(Vec2(visibleSize.width/2, visibleSize.height/2));
     this->addChild(sprite, 0);
     
@@ -54,7 +58,7 @@ void HelloWorld::menuStartCallback(Ref* pSender)
     auto scene = GameScene::createScene();
 	auto director = Director::getInstance();
     // run
-	auto reScene = CCTransitionPageTurn::create(1.0, scene, false);
+	auto reScene = TransitionCrossFade::create(1.0, scene);
 	CCDirector::sharedDirector()->replaceScene(reScene);
 
 }
