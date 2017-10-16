@@ -23,18 +23,18 @@ bool GameScene::init()
 	this->addChild(sprite, 0);
 
 	this->timeAxis = Sprite::create("UI/timeAxis.png");
-	timeAxis->setAnchorPoint(Vec2(0.5, 0.5));
-	timeAxis->setPosition(Vec2(375, 1184));
+	this->timeAxis->setAnchorPoint(Vec2(0.5, 0.5));
+	this->timeAxis->setPosition(Vec2(375, 1234));
 	this->addChild(timeAxis, 1);
 
 	this->nowCard = Sprite::create("Cards/01/Cards.png");
-	nowCard->setAnchorPoint(Vec2(0.5, 0.5));
-	nowCard->setPosition(Vec2(375, 759));
+	this->nowCard->setAnchorPoint(Vec2(0.5, 0.5));
+	this->nowCard->setPosition(Vec2(375, 814));
 	this->addChild(nowCard, 1);
 
 	this->textBackground = Sprite::create("UI/textBackground.png");
-	textBackground->setAnchorPoint(Vec2(0.5, 0.5));
-	textBackground->setPosition(Vec2(375, 284));
+	this->textBackground->setAnchorPoint(Vec2(0.5, 0.5));
+	this->textBackground->setPosition(Vec2(375, 274));
 	this->addChild(textBackground, 1);
 
 	auto button1 = MenuItemImage::create(
@@ -67,6 +67,32 @@ bool GameScene::init()
 	mainButtons->setPosition(Vec2::ZERO);
 	this->addChild(mainButtons, 1);
 	
+	auto myListener = EventListenerTouchOneByOne::create();
+	myListener->setSwallowTouches(true);
+	myListener->onTouchBegan = [=](Touch* touch, Event* event)->bool
+	{
+		Vec2 location = touch->getLocation();
+		this->startDragCard(location);
+		return true;
+	};
+
+	myListener->onTouchMoved = [=](Touch* touch, Event* event)->bool
+	{
+		Vec2 location = touch->getLocation();
+		this->dragCard(location);
+		return true;
+	};
+
+	myListener->onTouchEnded = [=](Touch* touch, Event* event)->bool
+	{
+		Vec2 location = touch->getLocation();
+		this->endDragCard(location);
+		return true;
+	};
+
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(myListener, this);
+	this->scheduleUpdate();
+
 	return true;
 }
 
@@ -75,3 +101,41 @@ void GameScene::button1Callback(cocos2d::Ref* pSender) {}
 void GameScene::button2Callback(cocos2d::Ref* pSender) {}
 
 void GameScene::button3Callback(cocos2d::Ref* pSender) {}
+
+void GameScene::update(float dt) {}
+
+void GameScene::startDragCard(Vec2 location) {
+	Rect rect = Rect(this->nowCard->getPosition().x, this->nowCard->getPosition().y, this->nowCard->getContentSize().width, this->nowCard->getContentSize().height);
+	if (this->nowCard->getBoundingBox().containsPoint(location)) {
+		this->isCardDrag = true;
+		this->dragStartPositon = location;
+		this->dragCard(location);
+	}
+}
+
+void GameScene::dragCard(Vec2 location) {
+	if (this->isCardDrag) {
+		float dragX = dragStartPositon.x - location.x;
+		float dragY = dragStartPositon.y - location.y;
+		
+		if (dragX > 50) {
+			dragX = 50;
+		}
+		else if (dragX < -50) {
+			dragX = -50;
+		}
+		if (dragY > 50) {
+			dragY = 50;
+		}
+		else if (dragY < -50) {
+			dragY = -50;
+		}
+		this->nowCard -> setPosition(Vec2(375 - dragX, 814 - dragY));
+	}
+}
+
+
+void GameScene::endDragCard(Vec2 location) {
+	this->nowCard->setPosition(Vec2(375, 814));
+	this->isCardDrag = false;
+}
